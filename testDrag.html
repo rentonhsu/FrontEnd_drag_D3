@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+<body>
+	<svg id="app" width=1200 height=600>
+		<g name="lines"></g>
+		<g name="circles">
+			<circle name='c1' r=10 cx = 50 cy = 50 />
+			<circle name='c2' r=10 cx = 150 cy = 200 />
+		</g>
+	</svg>
+
+	<script type="text/javascript">
+
+		function diagonalPro(p1,p2)
+		{
+			var x1 = parseInt(p1[0]);
+			var y1 = parseInt(p1[1]);
+			var x2 = parseInt(p2[0]);
+			var y2 = parseInt(p2[1]);
+			var diagonal = d3.svg.diagonal().source({x:x1,y:y1}).target({x:x2,y:y2});
+			return diagonal;
+		}
+
+
+
+	 function dragstarted(d) {
+				var dragEleType = $(this).attr(name);
+				console.log(this);
+    			d3.select('path')
+			    .attr("cx", d3.event.x - offset/2 )
+			    .attr("cy", d3.event.y);
+	}
+
+	function dragged() {
+		
+			// console.log(d3.event);
+			d3.select(targetCircle)
+		    .attr("cx", d3.event.x + offset/2 )
+		    .attr("cy", d3.event.y);
+	}
+
+	function dragended(d) {
+		
+	}
+
+
+	var drag = d3.behavior.drag()  
+            .on('dragstart', function() { 
+            })
+            .on('drag', function() { 
+        	var name = $(this).attr('name');
+        	var x1;
+        	var y1;
+        	var x2;
+        	var y2;
+        	if(name==='c1')
+        	{
+        		x1 = d3.event.x;
+        		y1 = d3.event.y;
+        		x2 = d3.select('circle[name="c2"]').attr('cx');
+        		y2 = d3.select('circle[name="c2"]').attr('cy');
+        		var path_d = diagonalPro([x1,y1],[x2,y2]);
+        		d3.select('path').attr('d',path_d);
+
+        	}
+			else{
+				x2 = d3.event.x;
+        		y2 = d3.event.y;
+        		x1 = d3.select('circle[name="c1"]').attr('cx');
+        		y1 = d3.select('circle[name="c1"]').attr('cy');
+        		var path_d = diagonalPro([x1,y1],[x2,y2]);
+        		d3.select('path').attr('d',path_d);
+			}
+        	d3.select(this).attr({'cx':d3.event.x,'cy':d3.event.y});
+            
+            })
+            .on('dragend', function() { 
+            });
+
+
+	var p1 = [d3.select('circle[name="c1"]').attr('cx'),d3.select('circle[name="c1"]').attr('cy')];
+	var p2 = [d3.select('circle[name="c2"]').attr('cx'),d3.select('circle[name="c2"]').attr('cy')];
+	var line = (diagonalPro(p1,p2))();
+	d3.select('g[name="lines"]').append('path').attr('fill','none').attr('stroke','orange').attr('stroke-width',1).attr('d',line).attr('parent','c1').attr('child','c2');
+
+
+	d3.select('circle[name="c1"]')
+    .call(drag);
+
+    d3.select('circle[name="c2"]')
+    .call(drag);
+
+
+
+
+	</script>
+</body>
+</html>
